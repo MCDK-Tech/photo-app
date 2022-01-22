@@ -1,0 +1,20 @@
+<aside>
+    <div class = "heading">
+        <img class= "pfp" src = "{{ user.get('profile_url') }}" alt = ""/>
+        <h2> {{ user.get('username')}} </h2>
+    </div>
+
+    <div class = "suggestions"> 
+        <h2>Suggestions for you</h2>
+        {% for suggestion in suggestions %}
+            <div class = "pfps">
+                <img class = "pfp" src = "{{suggestion.get('thumb_url')}}" alt = ""/>
+                <div class = "pfpinfo">
+                    <h1>{{suggestion.get('username')}}</h1>
+                    <h3>suggested for you</h3>
+                </div>
+                <li><a href="#">follow</a></li>
+            </div> 
+        {% endfor %}
+    </div>
+</aside>
