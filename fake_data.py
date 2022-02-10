@@ -24,14 +24,10 @@ def format_display_time(the_date):
     if days == 0:
         if hours < 0:
             return 'Just now'
-        elif hours == 1:
-            return '1 hour ago'
         else:
-            return '{0} hours ago'.format(hours)
-    elif days == 1:
-        return '1 day ago'
+            return '{0} hour{1} ago'.format(hours, 's' if hours > 1 else '')
     else:
-        return '{0} days ago'.format(days)
+        return '{0} day{1} ago'.format(days, 's' if days > 1 else '')
 
 def generate_user():
     '''
@@ -58,7 +54,6 @@ def generate_user():
         'profile_url': profile_url,
         'thumb_url': thumb_url 
     }
-
 
 def generate_posts(n=10, width=300, height=200):
     '''
