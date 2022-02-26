@@ -1,8 +1,0 @@
-<header class="stories">
-    {% for story in stories %}
-        <div>
-            <img src="{{ story.get('user').get('thumb_url') }}" class="pic" alt="profile pic for {{ story.get('user').get('username') }}" />
-            <p>{{ story.get('user').get('username') }}</p>
-        </div>
-    {% endfor %}
-</header>
