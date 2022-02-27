@@ -35,7 +35,6 @@
         method: "{{ item.method }}",
         headers: {
             'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': '{{ csrf }}'
         }{% if item.method in ['POST', 'PATCH'] %},
         body: JSON.stringify(postData){% endif %}
     })
@@ -54,18 +53,12 @@ post_data = {{ item.sample_body }};
 
 response = requests.{{ item.method|lower }}(
     '{{ url_root }}{{ item.endpoint_example }}', 
-    json=post_data,
-    headers={
-        'Authorization': 'Bearer {{ access_token }}'
-    }
+    json=post_data
 )
 print('Status Code:', response.status_code)
 print(response.json()){% else %}
 response = requests.{{ item.method|lower }}(
-    '{{ url_root }}{{ item.endpoint_example }}',
-    headers={
-        'Authorization': 'Bearer {{ access_token }}'
-    }
+    '{{ url_root }}{{ item.endpoint_example }}'
 )
 print('Status Code:', response.status_code)
 print(response.json()){% endif %}</code></pre>
