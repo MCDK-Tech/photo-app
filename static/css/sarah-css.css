@@ -258,7 +258,22 @@ aside header .pic {
     display: flex;
     justify-content: center;
     align-items: center;
+    
+    
 }
+
+.post1{
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    background-color: rgba(50, 50, 50, 0.8);
+    width: 100vw;
+    height: 80vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 
 .modal-bg button {
     position: fixed;
@@ -271,9 +286,19 @@ aside header .pic {
     width: 80vw;
     height: 80vh;
     border-radius: 5px;
+
 }
 
+/* #modal-container{
+    position: sticky;
+    overflow: hidden;
+} */
 
+.allcomments{
+    background-color: white;
+    overflow-y: scroll;
+    height: 100%;
+}
 
 
 @media (max-width: 700px) {

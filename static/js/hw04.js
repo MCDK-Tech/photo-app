@@ -28,16 +28,55 @@ const showPostDetail = ev => {
         .then(post => {
             const html = `
                 <div class="modal-bg">
+                    
+                <div class="post1">
                     <button onclick="destroyModal(event)">Close</button>
                     <div class="modal">
                         <img src="${post.image_url}" />
                     </div>
+                
+                <div class="allcomments">
+                
+                    <div class="comment">
+                        ${
+                            getCommentDetail(
+                                post.user.thumb_url, 
+                                post.user.username,
+                                post.caption,
+                                post.display_time
+                            )
+                        }
+
+                        ${
+                            post.comments.map(comment => {
+                                return getCommentDetail(
+                                    comment.user.thumb_url, 
+                                    comment.user.username,
+                                    comment.text,
+                                    comment.display_time
+                                )
+                            }).join('')
+                        }
+                    </div>
+                    </div>
+                </div>
                 </div>`;
-            // var x = document.createElement("div");
-            // x.innerHTML = html;
-            // document.body.appendChild(x.firstElementChild)
+
             document.querySelector('#modal-container').innerHTML = html;
         })
+};
+
+const getCommentDetail = (imageURL, username, text, timestamp) => {
+    return `<div class="comment">
+        <img class="pic" src="${imageURL}" />
+        <div>
+            <p>
+                <strong>${username}</strong> ${text}
+            </p>
+            <span>${timestamp}</span>
+        </div>
+       
+    </div>`;
 };
 
 const displayComments = (comments, postID) => {
@@ -317,6 +356,7 @@ const unfollow = (followingId, userId) => {
         elem.removeAttribute('data-following-id', data.id);
     });
 };
+
 
 
 
