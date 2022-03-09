@@ -3,7 +3,7 @@ from flask_restful import Resource
 from models import Post, db
 
 from views import security, get_authorized_user_ids
-
+from flask_jwt_extended import current_user, jwt_required
 import json
 
 def get_path():
@@ -14,6 +14,7 @@ class PostListEndpoint(Resource):
     def __init__(self, current_user):
         self.current_user = current_user
 
+    @jwt_required()
     def get(self):
         ids = get_authorized_user_ids(self.current_user)
         posts = Post.query.filter(Post.user_id.in_(ids))
@@ -36,6 +37,7 @@ class PostListEndpoint(Resource):
         ]
         return Response(json.dumps(data), mimetype="application/json", status=200)
 
+    @jwt_required()
     def post(self):
         body = request.get_json()
         image_url = body.get('image_url')
@@ -56,7 +58,7 @@ class PostDetailEndpoint(Resource):
     def __init__(self, current_user):
         self.current_user = current_user
         
-    
+    @jwt_required()
     @security.id_is_valid
     @security.user_can_edit_post
     def patch(self, id):
@@ -73,6 +75,7 @@ class PostDetailEndpoint(Resource):
         db.session.commit()        
         return Response(json.dumps(post.to_dict(user=self.current_user)), mimetype="application/json", status=200)
     
+    @jwt_required()
     @security.id_is_valid
     @security.user_can_edit_post
     def delete(self, id):
@@ -84,6 +87,7 @@ class PostDetailEndpoint(Resource):
         }
         return Response(json.dumps(serialized_data), mimetype="application/json", status=200)
 
+    @jwt_required()
     @security.id_is_valid
     @security.user_can_view_post
     def get(self, id):

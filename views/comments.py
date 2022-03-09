@@ -5,12 +5,14 @@ from . import can_view_post
 import json
 from models import db, Comment, Post
 from my_decorators import is_valid_id, is_valid_post_int, user_can_view_post_id
+from flask_jwt_extended import current_user, jwt_required
 
 class CommentListEndpoint(Resource):
 
     def __init__(self, current_user):
         self.current_user = current_user
 
+    @jwt_required()
     @is_valid_post_int
     @user_can_view_post_id
     def post(self):
@@ -30,7 +32,7 @@ class CommentDetailEndpoint(Resource):
 
     def __init__(self, current_user):
         self.current_user = current_user
-    
+    @jwt_required()
     @is_valid_id   
     def delete(self, id):
         comment = Comment.query.get(id)

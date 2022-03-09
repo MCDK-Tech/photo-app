@@ -1,6 +1,7 @@
 from flask import Response, request
 from flask_restful import Resource
 import json
+from flask_jwt_extended import current_user, jwt_required
 
 def get_path():
     return request.host_url + 'api/posts/'
@@ -10,6 +11,7 @@ class ProfileDetailEndpoint(Resource):
     def __init__(self, current_user):
         self.current_user = current_user
 
+    @jwt_required()
     def get(self):
         
         return Response(json.dumps(self.current_user.to_dict()), mimetype="application/json", status=200)

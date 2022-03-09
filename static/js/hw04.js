@@ -123,6 +123,7 @@ const addComment = (ev, postId) => {
         method: "POST",
         headers: {
             'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': getCookie('csrf_access_token'),
         },
         body: JSON.stringify({ "post_id": postId, "text": comments })
     })
@@ -132,6 +133,22 @@ const addComment = (ev, postId) => {
         updatePost(postId);
     });
     
+};
+
+const getCookie = key => {
+    let name = key + "=";
+    let decodedCookie = decodeURIComponent(document.cookie);
+    let ca = decodedCookie.split(';');
+    for (let i = 0; i < ca.length; i++) {
+        let c = ca[i];
+        while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+        }
+    }
+    return "";
 };
 /*
 <section class="card">
@@ -192,6 +209,7 @@ const like = postId => {
         method: "POST",
         headers: {
             'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': getCookie('csrf_access_token'),
         },
         body: JSON.stringify({ "post_id": postId })
     })
@@ -205,7 +223,10 @@ const like = postId => {
 const unlike = (likeId, postId) => {
     console.log('unlike', likeId, postId);
     fetch(`/api/posts/${ postId }/likes/${likeId}`,{
-        method: "DELETE"
+        method: "DELETE",
+        headers: {
+            'X-CSRF-TOKEN': getCookie('csrf_access_token')
+        }
     })
     .then(response => response.json())
     .then(data => {
@@ -325,6 +346,7 @@ const follow = userId => {
         method: "POST",
         headers: {
             'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': getCookie('csrf_access_token'),
         },
         body: JSON.stringify({ "user_id": userId })
     })
@@ -343,7 +365,10 @@ const follow = userId => {
 const unfollow = (followingId, userId) => {
     console.log('unfollow', followingId, userId);
     fetch(`/api/following/${ followingId }`,{
-        method: "DELETE"
+        method: "DELETE",
+        headers: {
+            'X-CSRF-TOKEN': getCookie('csrf_access_token')
+        }
     })
     .then(response => response.json())
     .then(data => {
@@ -379,6 +404,7 @@ const Bookmarked = postId => {
         method: "POST",
         headers: {
             'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': getCookie('csrf_access_token'),
         },
         body: JSON.stringify({ "post_id": postId })
     })
@@ -392,7 +418,10 @@ const Bookmarked = postId => {
 const unBookmarked = (bookmarkId, postId) => {
     console.log('unbookmarked', bookmarkId, postId);
     fetch(`/api/bookmarks/${ bookmarkId }`,{
-        method: "DELETE"
+        method: "DELETE",
+        headers: {
+            'X-CSRF-TOKEN': getCookie('csrf_access_token'),
+        }
     })
     .then(response => response.json())
     .then(data => {

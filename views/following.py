@@ -5,6 +5,7 @@ import json
 
 from tests.utils import get_authorized_user_ids
 from my_decorators import is_valid_id, is_valid_post_int, user_can_view_post_id, id_is_valid
+from flask_jwt_extended import current_user, jwt_required
 
 def get_path():
     return request.host_url + 'api/posts/'
@@ -13,12 +14,13 @@ class FollowingListEndpoint(Resource):
     def __init__(self, current_user):
         self.current_user = current_user
     
+    @jwt_required()
     def get(self):
-
+        
         following = Following.query.filter_by(user_id=self.current_user.id)
         return Response(json.dumps([model.to_dict_following() for model in following]), mimetype="application/json", status=200)
     
-    
+    @jwt_required()
     def post(self):
         body = request.get_json()
         user_id = body.get('user_id')
@@ -62,7 +64,7 @@ class FollowingListEndpoint(Resource):
 class FollowingDetailEndpoint(Resource):
     def __init__(self, current_user):
         self.current_user = current_user
-    
+    @jwt_required()
     @is_valid_id   
     def delete(self, id):
         following = Following.query.get(id)

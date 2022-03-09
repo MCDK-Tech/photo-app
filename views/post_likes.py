@@ -4,12 +4,14 @@ from models import LikePost, db, like_post, Post
 import json
 from . import can_view_post, get_authorized_user_ids
 from my_decorators import is_valid_id, is_valid_post_int, user_can_view_post_id, id_is_valid
+from flask_jwt_extended import current_user, jwt_required
 
 class PostLikesListEndpoint(Resource):
 
     def __init__(self, current_user):
         self.current_user = current_user
     
+    @jwt_required()
     def post(self, post_id):
         try:
             post_id= int(post_id)
@@ -45,7 +47,7 @@ class PostLikesDetailEndpoint(Resource):
     def __init__(self, current_user):
         self.current_user = current_user
     
-    
+    @jwt_required()
     def delete(self, post_id, id):
         try:
             id= int(id)
