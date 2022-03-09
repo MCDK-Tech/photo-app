@@ -2,6 +2,7 @@ from models import Post, Comment
 from flask import Response, request
 from views import can_view_post
 import json
+from flask_jwt_extended import current_user, jwt_required
 
 def get_does_not_exist_response(model_name, id):
     return Response(
@@ -47,7 +48,7 @@ def user_can_view_post(func):
     def wrapper(self, *args, **kwargs):
         body = request.get_json()
         id = kwargs.get('id') or kwargs.get('post_id') or body.get('post_id')
-        if (can_view_post(id, self.current_user)):
+        if (can_view_post(id, current_user)):
             return func(self, *args, **kwargs)
         else:
             return get_does_not_exist_response('Post', id)
@@ -58,7 +59,7 @@ def user_can_edit_post(func):
         body = request.get_json()
         id = kwargs.get('id') or kwargs.get('post_id') or body.get('post_id')
         post = Post.query.get(id)
-        if not post or post.user_id != self.current_user.id:
+        if not post or post.user_id != current_user.id:
             return get_does_not_exist_response('Post', id)
         else:
             return func(self, *args, **kwargs)
@@ -67,7 +68,7 @@ def user_can_edit_post(func):
 def user_can_edit_comment(func):
     def wrapper(self, *args, **kwargs):
         comment = Comment.query.get(kwargs.get('id'))
-        if not comment or comment.user_id != self.current_user.id:
+        if not comment or comment.user_id != current_user.id:
             return get_does_not_exist_response('Comment', kwargs.get('id'))
         else:
             return func(self, *args, **kwargs)

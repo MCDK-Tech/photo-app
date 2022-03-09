@@ -8,8 +8,6 @@ from flask_jwt_extended import current_user, jwt_required
 
 class PostLikesListEndpoint(Resource):
 
-    def __init__(self, current_user):
-        self.current_user = current_user
     
     @jwt_required()
     def post(self, post_id):
@@ -25,11 +23,11 @@ class PostLikesListEndpoint(Resource):
 
         if not likes:
             return Response(json.dumps({'message': 'id not in database' }), mimetype="application/json", status=404)
-        elif likes.user_id not in get_authorized_user_ids(self.current_user):
+        elif likes.user_id not in get_authorized_user_ids(current_user):
             return Response(json.dumps({'message': 'You did not create likes id={0}'.format(id)}), mimetype="application/json", status=404)
 
         try: 
-            likes = LikePost(self.current_user.id, post_id)
+            likes = LikePost(current_user.id, post_id)
             db.session.add(likes)
             db.session.commit()
         except:
@@ -44,8 +42,6 @@ class PostLikesListEndpoint(Resource):
 
 class PostLikesDetailEndpoint(Resource):
 
-    def __init__(self, current_user):
-        self.current_user = current_user
     
     @jwt_required()
     def delete(self, post_id, id):
@@ -59,7 +55,7 @@ class PostLikesDetailEndpoint(Resource):
         likes = LikePost.query.get(id)
         if not likes:
             return Response(json.dumps({'message': 'id not in database' }), mimetype="application/json", status=404)
-        elif likes.user_id != self.current_user.id:
+        elif likes.user_id != current_user.id:
             return Response(json.dumps({'message': 'You did not create likes id={0}'.format(id)}), mimetype="application/json", status=404)
     
             
@@ -77,12 +73,11 @@ def initialize_routes(api):
         PostLikesListEndpoint, 
         '/api/posts/<post_id>/likes', 
         '/api/posts/<post_id>/likes/', 
-        resource_class_kwargs={'current_user': api.app.current_user}
+
     )
 
     api.add_resource(
         PostLikesDetailEndpoint, 
         '/api/posts/<post_id>/likes/<id>', 
         '/api/posts/<post_id>/likes/<id>/',
-        resource_class_kwargs={'current_user': api.app.current_user}
     )

@@ -11,12 +11,10 @@ def get_path():
 
 class PostListEndpoint(Resource):
 
-    def __init__(self, current_user):
-        self.current_user = current_user
 
     @jwt_required()
     def get(self):
-        ids = get_authorized_user_ids(self.current_user)
+        ids = get_authorized_user_ids(current_user)
         posts = Post.query.filter(Post.user_id.in_(ids))
         limit = request.args.get('limit')
         if limit:
@@ -33,7 +31,7 @@ class PostListEndpoint(Resource):
         # note: if you pass the current user into to_dict(), it will tell you
         # whether or not the current user liked and/or bookmarked any of the posts
         data = [
-            item.to_dict(user=self.current_user) for item in posts.all()
+            item.to_dict(user=current_user) for item in posts.all()
         ]
         return Response(json.dumps(data), mimetype="application/json", status=200)
 
@@ -45,18 +43,17 @@ class PostListEndpoint(Resource):
             return Response(json.dumps({'message': '"image_url" is required.'}), mimetype="application/json", status=400)
         caption = body.get('caption')
         alt_text = body.get('alt_text')
-        user_id = self.current_user.id # id of the user who is logged in
+        user_id = current_user.id # id of the user who is logged in
         
         # create post:
         post = Post(image_url, user_id, caption, alt_text)
         db.session.add(post)
         db.session.commit()
-        return Response(json.dumps(post.to_dict(user=self.current_user)), mimetype="application/json", status=201)
+        return Response(json.dumps(post.to_dict(user=current_user)), mimetype="application/json", status=201)
         
 class PostDetailEndpoint(Resource):
 
-    def __init__(self, current_user):
-        self.current_user = current_user
+ 
         
     @jwt_required()
     @security.id_is_valid
@@ -73,7 +70,7 @@ class PostDetailEndpoint(Resource):
         
         # commit changes:
         db.session.commit()        
-        return Response(json.dumps(post.to_dict(user=self.current_user)), mimetype="application/json", status=200)
+        return Response(json.dumps(post.to_dict(user=current_user)), mimetype="application/json", status=200)
     
     @jwt_required()
     @security.id_is_valid
@@ -92,16 +89,16 @@ class PostDetailEndpoint(Resource):
     @security.user_can_view_post
     def get(self, id):
         post = Post.query.get(id)
-        return Response(json.dumps(post.to_dict(user=self.current_user)), mimetype="application/json", status=200)
+        return Response(json.dumps(post.to_dict(user=current_user)), mimetype="application/json", status=200)
 
 def initialize_routes(api):
     api.add_resource(
         PostListEndpoint, 
-        '/api/posts', '/api/posts/', 
-        resource_class_kwargs={'current_user': api.app.current_user}
+        '/api/posts', '/api/posts/'
+   
     )
     api.add_resource(
         PostDetailEndpoint, 
-        '/api/posts/<id>', '/api/posts/<id>/',
-        resource_class_kwargs={'current_user': api.app.current_user}
+        '/api/posts/<id>', '/api/posts/<id>/'
+
     )

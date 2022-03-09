@@ -1,3 +1,4 @@
+from turtle import pos
 from flask import Response, request
 from flask_restful import Resource
 from models import Bookmark, bookmark, db
@@ -27,6 +28,7 @@ class BookmarksListEndpoint(Resource):
     @secure_bookmark
     @handle_db_insert_error
     def post(self):
+        print("state")
         '''
         Goal: 
             1. get the post_id from the request body
@@ -40,12 +42,26 @@ class BookmarksListEndpoint(Resource):
         body = request.get_json()
         post_id = body.get('post_id')
         
+        # bookmark = Bookmark.query.filter_by(current_user.id, post_id)
+        # if not bookmark:
+            
+        #     return Response(
+        #         json.dumps({
+        #             'message': 'bookmark has duplicates'.format(post_id, current_user.id)}
+        #         ), 
+        #         mimetype="application/json", 
+        #         status=400
+        #     )
+
+        # print(bookmark)
         # to create a Bookmark, you need to pass it a user_id and a post_id
         try:
-            bookmark = Bookmark(self.current_user.id, post_id)
+            bookmark = Bookmark(current_user.id, post_id)
             db.session.add(bookmark)
             db.session.commit()
+            print("state1")
         except Exception:
+            print("state2")
             import sys
             print(sys.exc_info()[1])
             return Response(
@@ -55,6 +71,7 @@ class BookmarksListEndpoint(Resource):
                 mimetype="application/json", 
                 status=400
             )
+        print("state3")
         # these two lines save ("commit") the new record to the database:
         return Response(json.dumps(bookmark.to_dict()), mimetype="application/json", status=201)
 
@@ -63,8 +80,6 @@ class BookmarkDetailEndpoint(Resource):
     # 1. PATCH (updating), GET (individual bookmarks), DELETE individual bookmarks
     # 2. Create a new bookmark
 
-    def __init__(self, current_user):
-        self.current_user = current_user
     @jwt_required()
     @is_valid_id
     # @check_ownership_of_bookmark
@@ -97,13 +112,12 @@ def initialize_routes(api):
     api.add_resource(
         BookmarksListEndpoint, 
         '/api/bookmarks', 
-        '/api/bookmarks/', 
-        resource_class_kwargs={'current_user': api.app.current_user}
+        '/api/bookmarks/'
+
     )
 
     api.add_resource(
         BookmarkDetailEndpoint, 
         '/api/bookmarks/<id>', 
-        '/api/bookmarks/<id>',
-        resource_class_kwargs={'current_user': api.app.current_user}
+        '/api/bookmarks/<id>'
     )

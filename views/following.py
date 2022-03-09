@@ -11,13 +11,12 @@ def get_path():
     return request.host_url + 'api/posts/'
 
 class FollowingListEndpoint(Resource):
-    def __init__(self, current_user):
-        self.current_user = current_user
+
     
     @jwt_required()
     def get(self):
         
-        following = Following.query.filter_by(user_id=self.current_user.id)
+        following = Following.query.filter_by(user_id=current_user.id)
         return Response(json.dumps([model.to_dict_following() for model in following]), mimetype="application/json", status=200)
     
     @jwt_required()
@@ -44,7 +43,7 @@ class FollowingListEndpoint(Resource):
                     'message': 'User id={0} does not exist'.format(user_id)
                 }), mimetype="application/json", status=404)
         try:
-            following = Following(self.current_user.id, user_id)
+            following = Following(current_user.id, user_id)
             db.session.add(following)
             db.session.commit() 
         except Exception:
@@ -62,15 +61,14 @@ class FollowingListEndpoint(Resource):
 
 
 class FollowingDetailEndpoint(Resource):
-    def __init__(self, current_user):
-        self.current_user = current_user
+
     @jwt_required()
     @is_valid_id   
     def delete(self, id):
         following = Following.query.get(id)
         if not following:
             return Response(json.dumps({'message': 'id not in database' }), mimetype="application/json", status=404)
-        elif following.user_id != self.current_user.id:
+        elif following.user_id != current_user.id:
             return Response(json.dumps({'message': 'You did not create following id={0}'.format(id)}), mimetype="application/json", status=404)
         
         Following.query.filter_by(id=id).delete()
@@ -87,11 +85,11 @@ def initialize_routes(api):
         FollowingListEndpoint, 
         '/api/following', 
         '/api/following/', 
-        resource_class_kwargs={'current_user': api.app.current_user}
+
     )
     api.add_resource(
         FollowingDetailEndpoint, 
         '/api/following/<id>', 
         '/api/following/<id>/', 
-        resource_class_kwargs={'current_user': api.app.current_user}
+
     )

@@ -167,7 +167,7 @@ if __name__ == '__main__':
         TestBookmarkListEndpoint('test_bookmarks_get_check_if_data_structure_correct'),
         TestBookmarkListEndpoint('test_bookmarks_get_jwt_required'),
         
-        # POST Tests:
+        # # POST Tests:
         TestBookmarkListEndpoint('test_bookmark_post_valid_request_201'),
         TestBookmarkListEndpoint('test_bookmark_post_no_duplicates_400'),
         TestBookmarkListEndpoint('test_bookmark_post_invalid_post_id_format_400'),

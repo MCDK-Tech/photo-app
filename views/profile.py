@@ -8,13 +8,11 @@ def get_path():
 
 class ProfileDetailEndpoint(Resource):
 
-    def __init__(self, current_user):
-        self.current_user = current_user
 
     @jwt_required()
     def get(self):
         
-        return Response(json.dumps(self.current_user.to_dict()), mimetype="application/json", status=200)
+        return Response(json.dumps(current_user.to_dict()), mimetype="application/json", status=200)
 
 
 def initialize_routes(api):
@@ -22,5 +20,5 @@ def initialize_routes(api):
         ProfileDetailEndpoint, 
         '/api/profile', 
         '/api/profile/', 
-        resource_class_kwargs={'current_user': api.app.current_user}
+
     )

@@ -3,6 +3,7 @@ import json
 from flask import Response, request
 from views import can_view_post, get_authorized_user_ids
 from models import Bookmark, User
+from flask_jwt_extended import current_user, jwt_required
 
 # # Decorator Format:
 # # https://realpython.com/primer-on-python-decorators/
@@ -188,12 +189,9 @@ def handle_db_insert_error(endpoint_function):
             db_message = str(sys.exc_info()[1]) # stores DB error message
             print(db_message)                   # logs it to the console
             message = 'DECORATOR! Database Insert error. Make sure your post data is valid.'
-            post_data = request.get_json()
-            post_data['user_id'] = self.current_user.id
             response_obj = {
                 'message': message, 
-                'db_message': db_message,
-                'post_data': post_data
+                'db_message': db_message
             }
             return Response(json.dumps(response_obj), mimetype="application/json", status=400)
     return outer_function
@@ -233,8 +231,7 @@ def secure_bookmark(endpoint_function):
         body = request.get_json()
         post_id = body.get('post_id')
         print(post_id)
-        print(can_view_post(post_id, self.current_user))
-        if can_view_post(post_id, self.current_user):
+        if can_view_post(post_id, current_user):
             return endpoint_function(self)
         else:
             response_obj = {
@@ -249,7 +246,7 @@ def check_ownership_of_bookmark(endpoint_function):
     def outer_function_with_security_checks(self, id):
         print(id)
         bookmark = Bookmark.query.get(id)
-        if bookmark.user_id == self.current_user.id:
+        if bookmark.user_id == current_user.id:
             return endpoint_function(self, id)
         else:
             response_obj = {
@@ -263,7 +260,7 @@ def user_can_view_post_id(endpoint_function):
     def outer_function_with_security_checks(self):
         body = request.get_json()
         post_id = body.get('post_id')
-        if can_view_post(post_id, self.current_user):
+        if can_view_post(post_id, current_user):
             return endpoint_function(self)
         else:
             response_obj = {

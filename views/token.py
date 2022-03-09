@@ -15,7 +15,7 @@ class AccessTokenEndpoint(Resource):
         user = User.query.filter_by(username = username).first()
         if user is None:
             return Response(json.dumps({ 
-                    "No user"
+                    "message": "No user"
                 }), mimetype="application/json", status=401)
         if user.check_password(password):
             access_token = flask_jwt_extended.create_access_token(user.id)
@@ -26,7 +26,7 @@ class AccessTokenEndpoint(Resource):
             }), mimetype="application/json", status=200)
         else:
             return Response(json.dumps({ 
-                    "access_token": "new access token goes here"
+                    "message": "error"
                 }), mimetype="application/json", status=401)
 
         # check username and log in credentials. If valid, return tokens
@@ -38,12 +38,13 @@ class RefreshTokenEndpoint(Resource):
 
         body = request.get_json() or {}
         refresh_token = body.get('refresh_token')
-        user = User.query.filter_by(refresh_token = refresh_token).first()
-        if user is None:
+        # user = User.query.filter_by(refresh_token = refresh_token).first()
+
+        if not refresh_token:
             return Response(json.dumps({ 
-                    "no refresh_token"
+                   "message":  "no refresh_token"
                 }), mimetype="application/json", status=400)
-        # print(refresh_token)
+        print(refresh_token)
         '''
         https://flask-jwt-extended.readthedocs.io/en/latest/refreshing_tokens/
         Hint: To decode the refresh token and see if it expired:
@@ -52,15 +53,23 @@ class RefreshTokenEndpoint(Resource):
             decoded_token = flask_jwt_extended.decode_token(refresh_token)
             exp_timestamp = decoded_token.get("exp")
             current_timestamp = datetime.timestamp(datetime.now(timezone.utc))
+            print("1")
         except:
+            print("2")
             return Response(json.dumps({ 
                 "message": "Invalid refresh_token={0}. Could not decode.".format(refresh_token)
             }), mimetype="application/json", status=400)
+            
         if exp_timestamp > current_timestamp:
+            identity = decoded_token.get("sub")
+
+            access_token = flask_jwt_extended.create_access_token(identity=identity)
             return Response(json.dumps({ 
-                    "access_token": "new access token goes here"
+                    "access_token": access_token,
+                    "refresh_token": refresh_token
                 }), mimetype="application/json", status=200)
         else:
+            print("4")
             return Response(json.dumps({ 
                     "message": "refresh_token has expired"
                 }), mimetype="application/json", status=401)

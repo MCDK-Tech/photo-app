@@ -9,9 +9,6 @@ from flask_jwt_extended import current_user, jwt_required
 
 class CommentListEndpoint(Resource):
 
-    def __init__(self, current_user):
-        self.current_user = current_user
-
     @jwt_required()
     @is_valid_post_int
     @user_can_view_post_id
@@ -21,7 +18,7 @@ class CommentListEndpoint(Resource):
         text = body.get('text')
         if not text:
             return Response(json.dumps({'message': 'no text provided'}), mimetype="application/json", status = 400)
-        comment = Comment(str(text), self.current_user.id, id)
+        comment = Comment(str(text), current_user.id, id)
         # these two lines save ("commit") the new record to the database:
         db.session.add(comment)
         db.session.commit()
@@ -30,15 +27,13 @@ class CommentListEndpoint(Resource):
 
 class CommentDetailEndpoint(Resource):
 
-    def __init__(self, current_user):
-        self.current_user = current_user
     @jwt_required()
     @is_valid_id   
     def delete(self, id):
         comment = Comment.query.get(id)
         if not comment:
             return Response(json.dumps({'message': 'id not in database' }), mimetype="application/json", status=404)
-        elif comment.user_id != self.current_user.id:
+        elif comment.user_id != current_user.id:
             return Response(json.dumps({'message': 'You did not create bookmark id={0}'.format(id)}), mimetype="application/json", status=404)
         
         Comment.query.filter_by(id=id).delete()
@@ -54,12 +49,10 @@ def initialize_routes(api):
         CommentListEndpoint, 
         '/api/comments', 
         '/api/comments/',
-        resource_class_kwargs={'current_user': api.app.current_user}
 
     )
     api.add_resource(
         CommentDetailEndpoint, 
         '/api/comments/<id>', 
         '/api/comments/<id>',
-        resource_class_kwargs={'current_user': api.app.current_user}
     )
