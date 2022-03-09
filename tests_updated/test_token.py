@@ -139,7 +139,7 @@ class TestRefreshTokenEndpoint(unittest.TestCase):
 
 if __name__ == '__main__':
     # to run all of the tests:
-    # unittest.main()
+    # unittest.main().
 
     # to run some of the tests (convenient for commenting out some of the tests):
     suite = unittest.TestSuite()
