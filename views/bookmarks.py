@@ -1,4 +1,3 @@
-from turtle import pos
 from flask import Response, request
 from flask_restful import Resource
 from models import Bookmark, bookmark, db
